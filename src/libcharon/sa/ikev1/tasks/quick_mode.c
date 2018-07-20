@@ -865,7 +865,8 @@ METHOD(task_t, build_i, status_t,
 				return FAILED;
 			}
 
-			group = this->config->get_ke_method(this->config);
+			group = this->config->get_algorithm(this->config,
+												DIFFIE_HELLMAN_GROUP);
 			if (group != MODP_NONE)
 			{
 				proposal_t *proposal;
