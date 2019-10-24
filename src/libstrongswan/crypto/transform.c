@@ -58,7 +58,7 @@ enum_name_t* transform_get_enum_names(transform_type_t type)
 		case INTEGRITY_ALGORITHM:
 			return integrity_algorithm_names;
 		case DIFFIE_HELLMAN_GROUP:
-			return diffie_hellman_group_names;
+			return key_exchange_method_names;
 		case EXTENDED_SEQUENCE_NUMBERS:
 			return extended_sequence_numbers_names;
 		case EXTENDED_OUTPUT_FUNCTION:

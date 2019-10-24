@@ -19,7 +19,7 @@
 #include <crypto/transform.h>
 #include <crypto/crypters/crypter.h>
 #include <crypto/signers/signer.h>
-#include <crypto/diffie_hellman.h>
+#include <crypto/key_exchange.h>
 
 %}
 struct proposal_token {
