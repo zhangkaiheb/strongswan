@@ -17,6 +17,8 @@
 
 #include "key_exchange.h"
 
+#include <collections/hashtable.h>
+
 ENUM_BEGIN(key_exchange_method_names, MODP_NONE, MODP_1024_BIT,
 	"MODP_NONE",
 	"MODP_768",
@@ -435,6 +437,49 @@ static struct {
 	},
 };
 
+/**
+ * Proposal tokens for additional key exchanges.
+ */
+static hashtable_t *tokens;
+
+/**
+ * Parse ke<1-7>_<method> for additional key exchange methods.
+ */
+static proposal_token_t *additional_key_exchange_parser(const char *algname)
+{
+	proposal_token_t *token;
+	const proposal_token_t *base;
+	u_int num;
+	char alg[256];
+
+	token = tokens->get(tokens, algname);
+	if (token)
+	{
+		return token;
+	}
+	if (sscanf(algname, "ke%1u_%255s", &num, &alg) != 2)
+	{
+		return NULL;
+	}
+	if (num < 1 || num > 7)
+	{
+		return NULL;
+	}
+	base = lib->proposal->get_token(lib->proposal, alg);
+	if (!base || base->type != DIFFIE_HELLMAN_GROUP)
+	{
+		return NULL;
+	}
+	INIT(token,
+		.name = strdup(algname),
+		.type = ADDITIONAL_KEY_EXCHANGE_1 + num - 1,
+		.algorithm = base->algorithm,
+		.keysize = base->keysize,
+	);
+	tokens->put(tokens, token->name, token);
+	return token;
+}
+
 /*
  * Described in header
  */
@@ -458,6 +503,29 @@ void diffie_hellman_init()
 			dh_params[i].public.exp_len = dh_params[i].public.prime.len;
 		}
 	}
+
+	tokens = hashtable_create(hashtable_hash_str, hashtable_equals_str, 4);
+	lib->proposal->register_algname_parser(lib->proposal,
+										   additional_key_exchange_parser);
+}
+
+/*
+ * Described in header
+ */
+void diffie_hellman_deinit()
+{
+	enumerator_t *enumerator;
+	proposal_token_t *token;
+	char *name;
+
+	enumerator = tokens->create_enumerator(tokens);
+	while (enumerator->enumerate(enumerator, &name, &token))
+	{
+		free(name);
+		free(token);
+	}
+	enumerator->destroy(enumerator);
+	tokens->destroy(tokens);
 }
 
 /*

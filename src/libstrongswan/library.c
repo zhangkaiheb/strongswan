@@ -160,6 +160,8 @@ void library_deinit()
 	/* make sure the cache is clear before unloading plugins */
 	lib->credmgr->flush_cache(lib->credmgr, CERT_ANY);
 
+	diffie_hellman_deinit();
+
 	this->public.streams->destroy(this->public.streams);
 	this->public.watcher->destroy(this->public.watcher);
 	this->public.scheduler->destroy(this->public.scheduler);

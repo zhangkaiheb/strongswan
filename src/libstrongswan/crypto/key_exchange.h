@@ -172,6 +172,11 @@ struct diffie_hellman_params_t {
 void diffie_hellman_init();
 
 /**
+ * Deinitialize diffie hellman parameters during shutdown.
+ */
+void diffie_hellman_deinit();
+
+/**
  * Get the parameters associated with the specified Diffie-Hellman group.
  *
  * Before calling this method, use diffie_hellman_init() to initialize the
